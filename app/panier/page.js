@@ -39,6 +39,8 @@ export default function PanierPage() {
     setSubmitting(true);
     setError("");
 
+    const preselectionItems = items.map(({ id, name, price }) => ({ product_id: id, name, price }));
+
     const { error: insertError } = await supabase.from("preselections").insert({
       buyer_name: name.trim(),
       buyer_email: email.trim(),
@@ -46,7 +48,7 @@ export default function PanierPage() {
       is_minor: !!isMinor,
       parent_email: isMinor ? parentEmail.trim() : null,
       parent_phone: isMinor ? parentPhone.trim() : null,
-      items: items.map(({ id, name, price }) => ({ product_id: id, name, price })),
+      items: preselectionItems,
       total,
       status: isMinor ? "en_attente_parent" : "nouvelle",
     });
@@ -57,6 +59,32 @@ export default function PanierPage() {
       console.error(insertError);
       setError("Une erreur est survenue lors de l'envoi. Merci de réessayer.");
       return;
+    }
+
+    // Envoi des emails automatiques (notification interne + demande de confirmation parentale).
+    // mode "no-cors" : on ne lit pas la réponse, on ne bloque jamais l'utilisateur sur ce résultat.
+    const webhookUrl = process.env.NEXT_PUBLIC_EMAIL_WEBHOOK_URL;
+    if (webhookUrl) {
+      try {
+        await fetch(webhookUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "new_preselection",
+            buyer_name: name.trim(),
+            buyer_email: email.trim(),
+            buyer_phone: phone.trim() || null,
+            is_minor: !!isMinor,
+            parent_email: isMinor ? parentEmail.trim() : null,
+            parent_phone: isMinor ? parentPhone.trim() : null,
+            items: preselectionItems,
+            total,
+          }),
+        });
+      } catch (e) {
+        console.error("Email webhook error", e);
+      }
     }
 
     setSubmitted(true);
