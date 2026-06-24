@@ -23,20 +23,20 @@ export default function ProductCard({ product }) {
           <p className="text-sm text-stone-500 line-clamp-3">{product.description}</p>
         )}
         <div className="mt-auto pt-2 flex items-center justify-between">
-          <span className="font-semibold text-purple-700">{Number(product.price).toFixed(2)} €</span>
+          <span className="font-semibold text-lotus-700">{Number(product.price).toFixed(2)} €</span>
           {!product.in_stock ? (
             <span className="text-xs text-stone-400 italic">Rupture de stock</span>
           ) : inCart ? (
             <button
               onClick={() => removeItem(product.id)}
-              className="text-xs px-3 py-1.5 rounded-full border border-purple-300 text-purple-700 hover:bg-purple-50"
+              className="text-xs px-3 py-1.5 rounded-full border border-lotus-300 text-lotus-700 hover:bg-lotus-50"
             >
               Retirer
             </button>
           ) : (
             <button
               onClick={() => addItem(product)}
-              className="text-xs px-3 py-1.5 rounded-full bg-purple-700 text-white hover:bg-purple-800"
+              className="text-xs px-3 py-1.5 rounded-full bg-lotus-600 text-white hover:bg-lotus-700"
             >
               Ajouter
             </button>

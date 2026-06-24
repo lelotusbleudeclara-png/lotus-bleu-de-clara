@@ -94,12 +94,12 @@ export default function PanierPage() {
   if (submitted) {
     return (
       <div className="max-w-md mx-auto text-center py-16 space-y-3">
-        <h1 className="text-xl font-semibold text-purple-700">Merci pour votre présélection !</h1>
+        <h1 className="text-xl font-semibold text-lotus-700">Merci pour votre présélection !</h1>
         <p className="text-stone-600">
           Clara et l&apos;adulte référent du projet ont bien reçu votre demande. Vous serez
           recontacté(e) par email très prochainement.
         </p>
-        <Link href="/" className="inline-block mt-4 text-sm text-purple-700 underline">
+        <Link href="/" className="inline-block mt-4 text-sm text-lotus-700 underline">
           Retour au catalogue
         </Link>
       </div>
@@ -110,7 +110,7 @@ export default function PanierPage() {
     return (
       <div className="max-w-md mx-auto text-center py-16 space-y-3">
         <h1 className="text-xl font-semibold text-stone-700">Votre panier est vide</h1>
-        <Link href="/" className="inline-block mt-2 text-sm text-purple-700 underline">
+        <Link href="/" className="inline-block mt-2 text-sm text-lotus-700 underline">
           Découvrir le catalogue
         </Link>
       </div>
@@ -209,7 +209,7 @@ export default function PanierPage() {
         </div>
 
         {isMinor && (
-          <div className="space-y-4 border-l-2 border-purple-200 pl-4">
+          <div className="space-y-4 border-l-2 border-lotus-100 pl-4">
             <div>
               <label className="block text-sm text-stone-600 mb-1">
                 Email d&apos;un parent ou tuteur *
@@ -258,7 +258,7 @@ export default function PanierPage() {
         <button
           type="submit"
           disabled={!canSubmit}
-          className="w-full rounded-lg bg-purple-700 text-white py-3 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-purple-800 transition"
+          className="w-full rounded-lg bg-lotus-600 text-white py-3 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-lotus-700 transition"
         >
           {submitting ? "Envoi en cours..." : "Envoyer ma présélection"}
         </button>

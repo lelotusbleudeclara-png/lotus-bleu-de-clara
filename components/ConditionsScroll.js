@@ -23,7 +23,7 @@ export default function ConditionsScroll({ onReachedEnd }) {
       className="h-48 overflow-y-auto border border-stone-200 rounded-lg p-4 text-sm text-stone-600 bg-stone-50 space-y-3"
     >
       <p className="italic">
-        Le Lotus Bleu de Clara est un catalogue de bijoux artisanaux réalisés par Clara. Chaque
+        Le Lotus Bleu est un catalogue de bijoux artisanaux réalisés par Clara. Chaque
         commande est suivie par l&apos;adulte référent du projet (un parent de Clara), qui reste
         l&apos;interlocuteur final pour toute question.
       </p>

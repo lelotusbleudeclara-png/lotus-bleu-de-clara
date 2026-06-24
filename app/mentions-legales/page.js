@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Mentions légales, CGV et confidentialité — Le Lotus Bleu de Clara",
+  title: "Mentions légales, CGV et confidentialité — Le Lotus Bleu",
 };
 
 export default function MentionsLegalesPage() {
@@ -13,11 +13,11 @@ export default function MentionsLegalesPage() {
       </header>
 
       <section className="space-y-3">
-        <h2 className="text-base font-semibold text-purple-700">1. Mentions légales</h2>
+        <h2 className="text-base font-semibold text-lotus-700">1. Mentions légales</h2>
 
         <h3 className="font-medium text-stone-800">1.1 Édition du site</h3>
         <p>
-          Le site « Le Lotus Bleu de Clara » est édité par un particulier, à titre non
+          Le site « Le Lotus Bleu » est édité par un particulier, à titre non
           professionnel et non commercial, dans le cadre d&apos;une activité artisanale
           occasionnelle exercée par une mineure sous la responsabilité de l&apos;un de ses
           parents (ci-après l&apos;« adulte référent »).
@@ -56,12 +56,12 @@ export default function MentionsLegalesPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-base font-semibold text-purple-700">2. Conditions générales de vente</h2>
+        <h2 className="text-base font-semibold text-lotus-700">2. Conditions générales de vente</h2>
 
         <h3 className="font-medium text-stone-800">Article 1 — Objet</h3>
         <p>
           Les présentes conditions générales de vente régissent les ventes de bijoux artisanaux
-          réalisés par Clara, présentés sur le site Le Lotus Bleu de Clara. Cette activité est
+          réalisés par Clara, présentés sur le site Le Lotus Bleu. Cette activité est
           exercée à titre occasionnel et non professionnel ; elle ne constitue pas une activité
           commerciale organisée au sens du droit commercial.
         </p>
@@ -129,7 +129,7 @@ export default function MentionsLegalesPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-base font-semibold text-purple-700">3. Politique de confidentialité</h2>
+        <h2 className="text-base font-semibold text-lotus-700">3. Politique de confidentialité</h2>
 
         <h3 className="font-medium text-stone-800">3.1 Responsable du traitement</h3>
         <p>
