@@ -1,0 +1,15 @@
+{
+  "name": "Le Lotus Bleu — Espace vendeur",
+  "short_name": "Lotus Bleu Vendeur",
+  "description": "Interface de gestion du catalogue Le Lotus Bleu (catégories, produits, présélections, transactions, statistiques).",
+  "start_url": "/vendeur",
+  "scope": "/vendeur/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fbf8f2",
+  "theme_color": "#1e58c2",
+  "icons": [
+    { "src": "/vendeur/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/vendeur/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

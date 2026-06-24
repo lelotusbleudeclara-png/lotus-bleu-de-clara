@@ -1,4 +1,4 @@
-import "./globals.css";
+import "../globals.css";
 import Link from "next/link";
 import { Cormorant_Garamond, Dancing_Script, Work_Sans } from "next/font/google";
 import { CartProvider } from "@/lib/cart-context";
@@ -25,7 +25,7 @@ export const metadata = {
   description: "Catalogue de bijoux artisanaux faits main par Clara",
 };
 
-export default function RootLayout({ children }) {
+export default function SiteLayout({ children }) {
   return (
     <html lang="fr" className={`${cormorant.variable} ${dancingScript.variable} ${workSans.variable}`}>
       <body className="bg-ivory text-stone-800 antialiased min-h-screen flex flex-col">
