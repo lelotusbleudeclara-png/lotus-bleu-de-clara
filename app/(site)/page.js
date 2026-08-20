@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import LotusLogo from "@/components/LotusLogo";
 import PublicCatalog from "@/components/PublicCatalog";
