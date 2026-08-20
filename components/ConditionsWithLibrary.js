@@ -34,61 +34,64 @@ export default function ConditionsWithLibrary({ defaultValue }) {
   }
 
   return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-stone-700">
+    <div>
+      <label className="block text-sm font-medium text-stone-700 mb-1">
         Conditions d&apos;utilisation
       </label>
-      <textarea
-        name="conditions_utilisation"
-        rows={3}
-        value={value}
-        onChange={e => setValue(e.target.value)}
-        placeholder="Ex. Ne pas mouiller, d&#233;conseill&#233; aux moins de 3 ans..."
-        className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500"
-      />
+      <div className="flex gap-3 items-start">
+        {/* Textarea principale */}
+        <textarea
+          name="conditions_utilisation"
+          rows={6}
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          placeholder="Ex. Ne pas mouiller, déconseillé aux moins de 3 ans..."
+          className="flex-1 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500"
+        />
 
-      {/* Bibliothèque */}
-      <div className="bg-stone-50 rounded-xl border border-stone-200 p-3 space-y-2">
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-medium text-stone-500 uppercase tracking-wide">Biblioth&#232;que</p>
-          <button type="button" onClick={() => setShowAdd(!showAdd)}
-            className="text-xs text-lotus-700 hover:text-lotus-900">
-            {showAdd ? "Annuler" : "+ Ajouter un mod&#232;le"}
-          </button>
-        </div>
-
-        {showAdd && (
-          <div className="space-y-2 bg-white rounded-lg p-3 border border-stone-200">
-            <input type="text" placeholder="Nom du mod&#232;le (facultatif)" value={newLabel}
-              onChange={e => setNewLabel(e.target.value)}
-              className="w-full rounded-lg border border-stone-200 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-lotus-500" />
-            <textarea placeholder="Texte des conditions..." value={newText}
-              onChange={e => setNewText(e.target.value)} rows={3}
-              className="w-full rounded-lg border border-stone-200 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-lotus-500" />
-            <button type="button" onClick={saveTemplate}
-              className="w-full rounded-full bg-lotus-600 text-white text-xs font-medium px-3 py-1.5 hover:bg-lotus-700 transition">
-              Sauvegarder
+        {/* Bibliothèque à droite */}
+        <div className="w-52 flex-shrink-0 bg-stone-50 rounded-xl border border-stone-200 p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-stone-500 uppercase tracking-wide">Bibliothèque</p>
+            <button type="button" onClick={() => setShowAdd(!showAdd)}
+              className="text-xs text-lotus-700 hover:text-lotus-900 font-medium">
+              {showAdd ? "✕" : "+ Ajouter"}
             </button>
           </div>
-        )}
 
-        {templates.length === 0 && !showAdd && (
-          <p className="text-xs text-stone-400 italic">Aucun mod&#232;le enregistr&#233; — cliquez sur &quot;+ Ajouter&quot; pour commencer.</p>
-        )}
-
-        <div className="space-y-1">
-          {templates.map(t => (
-            <div key={t.id} className="flex items-center gap-2 bg-white rounded-lg border border-stone-200 px-3 py-2">
-              <button type="button" onClick={() => applyTemplate(t.text)}
-                className="flex-1 text-left text-xs text-stone-700 hover:text-lotus-700 transition truncate">
-                {t.label}
-              </button>
-              <button type="button" onClick={() => deleteTemplate(t.id)}
-                className="text-stone-300 hover:text-red-500 transition text-xs flex-shrink-0">
-                &#10005;
+          {showAdd && (
+            <div className="space-y-1.5 bg-white rounded-lg p-2 border border-stone-200">
+              <input type="text" placeholder="Nom du modèle" value={newLabel}
+                onChange={e => setNewLabel(e.target.value)}
+                className="w-full rounded border border-stone-200 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-lotus-500" />
+              <textarea placeholder="Texte des conditions..." value={newText}
+                onChange={e => setNewText(e.target.value)} rows={3}
+                className="w-full rounded border border-stone-200 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-lotus-500" />
+              <button type="button" onClick={saveTemplate}
+                className="w-full rounded-full bg-lotus-600 text-white text-xs font-medium px-2 py-1 hover:bg-lotus-700 transition">
+                Sauvegarder
               </button>
             </div>
-          ))}
+          )}
+
+          {templates.length === 0 && !showAdd && (
+            <p className="text-xs text-stone-400 italic leading-snug">Aucun modèle — cliquez sur &quot;+ Ajouter&quot; pour commencer.</p>
+          )}
+
+          <div className="space-y-1">
+            {templates.map(t => (
+              <div key={t.id} className="flex items-center gap-1 bg-white rounded border border-stone-200 px-2 py-1.5">
+                <button type="button" onClick={() => applyTemplate(t.text)}
+                  className="flex-1 text-left text-xs text-stone-700 hover:text-lotus-700 transition truncate">
+                  {t.label}
+                </button>
+                <button type="button" onClick={() => deleteTemplate(t.id)}
+                  className="text-stone-300 hover:text-red-500 transition text-xs flex-shrink-0">
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
