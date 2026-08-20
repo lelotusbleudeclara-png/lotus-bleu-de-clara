@@ -1,12 +1,13 @@
 export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { updateProduct, deleteProduct } from "@/lib/actions/products";
+import { updateProduct } from "@/lib/actions/products";
 import { uploadPhoto, addVideoUrl, approvePhoto, unapprovePhoto, deletePhoto, setMainPhoto } from "@/lib/actions/photos";
 import CategorySubcategorySelect from "@/components/CategorySubcategorySelect";
 import PhotoUploader from "@/components/PhotoUploader";
 import ConditionsWithLibrary from "@/components/ConditionsWithLibrary";
 import SaveSuccessDialog from "@/components/SaveSuccessDialog";
+import DeleteProductButton from "@/components/DeleteProductButton";
 
 function getYoutubeId(url) {
   const m = url?.match(/(?:youtu\.be\/|v=|\/embed\/)([a-zA-Z0-9_-]{11})/);
@@ -99,9 +100,7 @@ export default async function ProduitEditPage({ params, searchParams }) {
         </button>
       </form>
 
-      <form action={deleteProduct.bind(null, id)}>
-        <button type="submit" className="text-sm text-red-500 hover:text-red-700">Supprimer ce produit</button>
-      </form>
+      <DeleteProductButton productId={id} />
 
       <div className="space-y-4">
         <h2 className="text-lg text-lotus-800" style={{ fontFamily: "var(--font-heading)" }}>Photos &amp; vid&#233;os</h2>
