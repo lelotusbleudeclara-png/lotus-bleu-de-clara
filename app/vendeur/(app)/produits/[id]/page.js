@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { updateProduct, deleteProduct } from "@/lib/actions/products";
-import { approvePhoto, unapprovePhoto, deletePhoto } from "@/lib/actions/photos";
+import { uploadPhoto, addVideoUrl, approvePhoto, unapprovePhoto, deletePhoto } from "@/lib/actions/photos";
 import CategorySubcategorySelect from "@/components/CategorySubcategorySelect";
 import PhotoUploader from "@/components/PhotoUploader";
 
@@ -101,7 +101,7 @@ export default async function ProduitEditPage({ params }) {
       {/* Photos & vidéos */}
       <div className="space-y-4">
         <h2 className="text-lg text-lotus-800" style={{ fontFamily: "var(--font-heading)" }}>Photos &amp; vidéos</h2>
-        <PhotoUploader productId={id} />
+        <PhotoUploader uploadAction={uploadPhoto.bind(null, id)} addVideoAction={addVideoUrl.bind(null, id)} />
 
         {photosWithUrl.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

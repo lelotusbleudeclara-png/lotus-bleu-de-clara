@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, useTransition } from "react";
-import { uploadPhoto, addVideoUrl } from "@/lib/actions/photos";
+import { useRouter } from "next/navigation";
 
-export default function PhotoUploader({ productId }) {
+export default function PhotoUploader({ uploadAction, addVideoAction }) {
+  const router = useRouter();
   const [preview, setPreview] = useState(null);
   const [photoSuccess, setPhotoSuccess] = useState(false);
   const [videoSuccess, setVideoSuccess] = useState(false);
@@ -29,10 +30,11 @@ export default function PhotoUploader({ productId }) {
     setError(null);
     startPhoto(async () => {
       try {
-        await uploadPhoto(productId, fd);
+        await uploadAction(fd);
         setPreview(null);
         setPhotoSuccess(true);
         if (fileRef.current) fileRef.current.value = "";
+        router.refresh();
         setTimeout(() => setPhotoSuccess(false), 3000);
       } catch (err) {
         setError(err.message || "Erreur lors de l'upload.");
@@ -46,9 +48,10 @@ export default function PhotoUploader({ productId }) {
     setError(null);
     startVideo(async () => {
       try {
-        await addVideoUrl(productId, fd);
+        await addVideoAction(fd);
         setVideoSuccess(true);
         if (videoRef.current) videoRef.current.value = "";
+        router.refresh();
         setTimeout(() => setVideoSuccess(false), 3000);
       } catch (err) {
         setError(err.message || "Erreur lors de l'ajout de la vidéo.");
@@ -58,7 +61,6 @@ export default function PhotoUploader({ productId }) {
 
   return (
     <div className="space-y-4">
-      {/* Photo upload */}
       <form onSubmit={handlePhotoSubmit} className="space-y-2">
         <div className="flex gap-2 items-center">
           <label className="flex-1 flex items-center gap-3 cursor-pointer rounded-lg border border-stone-300 px-3 py-2 text-sm text-stone-600 hover:border-lotus-400 transition">
@@ -68,50 +70,28 @@ export default function PhotoUploader({ productId }) {
             ) : (
               <span className="text-stone-400">🖼 Choisir une photo…</span>
             )}
-            <input
-              ref={fileRef}
-              type="file"
-              name="photo"
-              accept="image/*"
-              required
-              onChange={handleFileChange}
-              className="sr-only"
-            />
+            <input ref={fileRef} type="file" name="photo" accept="image/*" required
+              onChange={handleFileChange} className="sr-only" />
           </label>
-          <button
-            type="submit"
-            disabled={isPendingPhoto || !preview}
-            className="rounded-full bg-lotus-600 text-white text-sm font-medium px-4 py-2 hover:bg-lotus-700 transition disabled:opacity-50 whitespace-nowrap"
-          >
+          <button type="submit" disabled={isPendingPhoto || !preview}
+            className="rounded-full bg-lotus-600 text-white text-sm font-medium px-4 py-2 hover:bg-lotus-700 transition disabled:opacity-50 whitespace-nowrap">
             {isPendingPhoto ? "Envoi…" : "Ajouter photo"}
           </button>
         </div>
-        {photoSuccess && (
-          <p className="text-sm text-lotus-700 flex items-center gap-1">✓ Photo ajoutée avec succès</p>
-        )}
+        {photoSuccess && <p className="text-sm text-lotus-700">✓ Photo ajoutée avec succès</p>}
       </form>
 
-      {/* Video URL */}
       <form onSubmit={handleVideoSubmit} className="space-y-2">
         <div className="flex gap-2">
-          <input
-            ref={videoRef}
-            type="url"
-            name="video_url"
+          <input ref={videoRef} type="url" name="video_url"
             placeholder="URL YouTube (ex. https://youtu.be/...)"
-            className="flex-1 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500"
-          />
-          <button
-            type="submit"
-            disabled={isPendingVideo}
-            className="rounded-full bg-stone-600 text-white text-sm font-medium px-4 py-2 hover:bg-stone-700 transition disabled:opacity-50 whitespace-nowrap"
-          >
+            className="flex-1 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500" />
+          <button type="submit" disabled={isPendingVideo}
+            className="rounded-full bg-stone-600 text-white text-sm font-medium px-4 py-2 hover:bg-stone-700 transition disabled:opacity-50 whitespace-nowrap">
             {isPendingVideo ? "Envoi…" : "Ajouter vidéo"}
           </button>
         </div>
-        {videoSuccess && (
-          <p className="text-sm text-lotus-700 flex items-center gap-1">✓ Vidéo ajoutée avec succès</p>
-        )}
+        {videoSuccess && <p className="text-sm text-lotus-700">✓ Vidéo ajoutée avec succès</p>}
       </form>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
