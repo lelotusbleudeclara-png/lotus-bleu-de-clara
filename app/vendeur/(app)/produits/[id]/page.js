@@ -15,8 +15,10 @@ async function safeFetch(promise) {
   try { const r = await promise; return r.data || []; } catch { return []; }
 }
 
-export default async function ProduitEditPage({ params }) {
+export default async function ProduitEditPage({ params, searchParams }) {
   const { id } = await params;
+  const sp = await searchParams;
+  const saved = sp?.saved === "1";
 
   const { data: product, error } = await supabaseAdmin.from("products").select("*").eq("id", id).single();
   if (error || !product) notFound();
@@ -40,6 +42,12 @@ export default async function ProduitEditPage({ params }) {
       <h1 className="text-2xl text-lotus-800" style={{ fontFamily: "var(--font-heading)" }}>
         {product.name}
       </h1>
+
+      {saved && (
+        <div className="rounded-xl bg-lotus-50 border border-lotus-200 text-lotus-700 text-sm px-4 py-3">
+          Modifications enregistrées avec succès.
+        </div>
+      )}
 
       <form action={updateProduct.bind(null, id)} className="space-y-5 bg-white rounded-2xl border border-stone-200 p-5">
         <CategorySubcategorySelect
