@@ -13,7 +13,7 @@ function getYoutubeId(url) {
 
 function ProductCard({ product }) {
   const approvedMedia = (product.product_photos || []).filter((p) => p.approved);
-  const firstPhoto = approvedMedia.find((p) => !p.video_url);
+  const firstPhoto = approvedMedia.find((p) => p.is_main && !p.video_url) || approvedMedia.find((p) => !p.video_url);
   const firstVideo = approvedMedia.find((p) => p.video_url);
   const thumb = firstPhoto ? getPublicUrl(firstPhoto.storage_path) : null;
 
