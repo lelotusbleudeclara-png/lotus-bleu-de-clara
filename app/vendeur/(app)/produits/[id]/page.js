@@ -2,8 +2,9 @@ export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { updateProduct, deleteProduct } from "@/lib/actions/products";
-import { uploadPhoto, addVideoUrl, approvePhoto, unapprovePhoto, deletePhoto } from "@/lib/actions/photos";
+import { approvePhoto, unapprovePhoto, deletePhoto } from "@/lib/actions/photos";
 import CategorySubcategorySelect from "@/components/CategorySubcategorySelect";
+import PhotoUploader from "@/components/PhotoUploader";
 
 function getYoutubeId(url) {
   const m = url?.match(/(?:youtu\.be\/|v=|\/embed\/)([a-zA-Z0-9_-]{11})/);
@@ -12,10 +13,17 @@ function getYoutubeId(url) {
 
 export default async function ProduitEditPage({ params }) {
   const { id } = await params;
-  const [{ data: product, error }, { data: categories }, { data: subcategories }, { data: photos }] = await Promise.all([
+
+  // subcategories query is fail-safe: table may not exist yet
+  const [
+    { data: product, error },
+    { data: categories },
+    { data: subcategories },
+    { data: photos },
+  ] = await Promise.all([
     supabaseAdmin.from("products").select("*").eq("id", id).single(),
     supabaseAdmin.from("categories").select("id, name").order("name"),
-    supabaseAdmin.from("subcategories").select("id, category_id, name").order("name"),
+    supabaseAdmin.from("subcategories").select("id, category_id, name").order("name").then(r => ({ data: r.data || [] })),
     supabaseAdmin.from("product_photos").select("*").eq("product_id", id).order("position"),
   ]);
   if (error || !product) notFound();
@@ -96,28 +104,21 @@ export default async function ProduitEditPage({ params }) {
         <button type="submit" className="text-sm text-red-500 hover:text-red-700">Supprimer ce produit</button>
       </form>
 
+      {/* Photos & vidéos */}
       <div className="space-y-4">
         <h2 className="text-lg text-lotus-800" style={{ fontFamily: "var(--font-heading)" }}>Photos &amp; vidéos</h2>
-
-        <form action={uploadPhoto.bind(null, id)} className="flex gap-2">
-          <input type="file" name="photo" accept="image/*" required className="flex-1 text-sm" />
-          <button type="submit" className="rounded-full bg-lotus-600 text-white text-sm font-medium px-4 py-2 hover:bg-lotus-700 transition whitespace-nowrap">Ajouter photo</button>
-        </form>
-
-        <form action={addVideoUrl.bind(null, id)} className="flex gap-2">
-          <input type="url" name="video_url" placeholder="URL YouTube (ex. https://youtu.be/...)"
-            className="flex-1 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500" />
-          <button type="submit" className="rounded-full bg-stone-600 text-white text-sm font-medium px-4 py-2 hover:bg-stone-700 transition whitespace-nowrap">Ajouter vidéo</button>
-        </form>
+        <PhotoUploader productId={id} />
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {photosWithUrl.map((media) => (
             <div key={media.id} className="bg-white rounded-xl border border-stone-200 overflow-hidden">
               {media.video_url ? (
-                <div className="w-full h-32 bg-stone-100 flex items-center justify-center text-xs text-stone-400">
+                <div className="w-full h-32 bg-stone-100">
                   {getYoutubeId(media.video_url) ? (
                     <iframe src={`https://www.youtube.com/embed/${getYoutubeId(media.video_url)}`} className="w-full h-32" allowFullScreen />
-                  ) : "URL invalide"}
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-xs text-stone-400">URL invalide</div>
+                  )}
                 </div>
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
