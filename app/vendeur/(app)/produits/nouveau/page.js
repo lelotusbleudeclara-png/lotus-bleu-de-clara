@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+export const dynamic = "force-dynamic";
 import { createProduct } from "@/lib/actions/products";
 
 export default async function NouveauProduitPage() {

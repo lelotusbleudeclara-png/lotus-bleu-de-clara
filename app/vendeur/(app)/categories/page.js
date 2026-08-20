@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+export const dynamic = "force-dynamic";
 import { createCategory, renameCategory, deleteCategory } from "@/lib/actions/categories";
 
 export default async function CategoriesPage() {
