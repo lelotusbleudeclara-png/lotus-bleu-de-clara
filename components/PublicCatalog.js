@@ -75,7 +75,7 @@ function ProductModal({ product, onClose, onAdd, cartQty }) {
         {/* Photo */}
         {thumb && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumb} alt={product.name} className="w-full h-64 object-cover mt-4" />
+          <img src={thumb} alt={product.name} className="w-full max-h-96 object-contain bg-stone-50 mt-4" />
         )}
 
         {/* Extra photos */}
