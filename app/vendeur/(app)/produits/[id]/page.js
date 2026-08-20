@@ -1,8 +1,9 @@
-import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
+import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { updateProduct, deleteProduct } from "@/lib/actions/products";
 import { uploadPhoto, addVideoUrl, approvePhoto, unapprovePhoto, deletePhoto } from "@/lib/actions/photos";
+import CategorySubcategorySelect from "@/components/CategorySubcategorySelect";
 
 function getYoutubeId(url) {
   const m = url?.match(/(?:youtu\.be\/|v=|\/embed\/)([a-zA-Z0-9_-]{11})/);
@@ -11,9 +12,10 @@ function getYoutubeId(url) {
 
 export default async function ProduitEditPage({ params }) {
   const { id } = await params;
-  const [{ data: product, error }, { data: categories }, { data: photos }] = await Promise.all([
+  const [{ data: product, error }, { data: categories }, { data: subcategories }, { data: photos }] = await Promise.all([
     supabaseAdmin.from("products").select("*").eq("id", id).single(),
     supabaseAdmin.from("categories").select("id, name").order("name"),
+    supabaseAdmin.from("subcategories").select("id, category_id, name").order("name"),
     supabaseAdmin.from("product_photos").select("*").eq("product_id", id).order("position"),
   ]);
   if (error || !product) notFound();
@@ -33,24 +35,27 @@ export default async function ProduitEditPage({ params }) {
       </h1>
 
       <form action={updateProduct.bind(null, id)} className="space-y-5 bg-white rounded-2xl border border-stone-200 p-5">
-        <div>
-          <label className="block text-sm font-medium text-stone-700 mb-1">Catégorie</label>
-          <select name="category_id" defaultValue={product.category_id || ""} className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500">
-            <option value="">— Sans catégorie —</option>
-            {categories?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        </div>
+        <CategorySubcategorySelect
+          categories={categories || []}
+          subcategories={subcategories || []}
+          defaultCategoryId={product.category_id || ""}
+          defaultSubcategoryId={product.subcategory_id || ""}
+        />
+
         <div>
           <label className="block text-sm font-medium text-stone-700 mb-1">Prix (€)</label>
-          <input type="text" name="price" required defaultValue={product.price} className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500" />
+          <input type="text" name="price" required defaultValue={product.price}
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500" />
         </div>
         <div>
           <label className="block text-sm font-medium text-stone-700 mb-1">Description</label>
-          <textarea name="description" rows={3} defaultValue={product.description || ""} className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500" />
+          <textarea name="description" rows={3} defaultValue={product.description || ""}
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500" />
         </div>
         <div>
           <label className="block text-sm font-medium text-stone-700 mb-1">Nom du produit</label>
-          <input type="text" name="name" required defaultValue={product.name} className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500" />
+          <input type="text" name="name" required defaultValue={product.name}
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500" />
         </div>
 
         <hr className="border-stone-100" />
@@ -81,7 +86,8 @@ export default async function ProduitEditPage({ params }) {
           <input type="checkbox" name="published" defaultChecked={product.published} className="rounded" /> Publié
         </label>
 
-        <button type="submit" className="w-full rounded-full bg-lotus-600 text-white text-sm font-medium px-5 py-2 hover:bg-lotus-700 transition">
+        <button type="submit"
+          className="w-full rounded-full bg-lotus-600 text-white text-sm font-medium px-5 py-2 hover:bg-lotus-700 transition">
           Enregistrer
         </button>
       </form>
@@ -99,7 +105,8 @@ export default async function ProduitEditPage({ params }) {
         </form>
 
         <form action={addVideoUrl.bind(null, id)} className="flex gap-2">
-          <input type="url" name="video_url" placeholder="URL YouTube (ex. https://youtu.be/...)" className="flex-1 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500" />
+          <input type="url" name="video_url" placeholder="URL YouTube (ex. https://youtu.be/...)"
+            className="flex-1 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500" />
           <button type="submit" className="rounded-full bg-stone-600 text-white text-sm font-medium px-4 py-2 hover:bg-stone-700 transition whitespace-nowrap">Ajouter vidéo</button>
         </form>
 
