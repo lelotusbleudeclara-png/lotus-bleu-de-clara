@@ -15,7 +15,6 @@ export default function CategorySubcategorySelect({ categories, subcategories, d
         </label>
         <select
           name="category_id"
-          required
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
           className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lotus-500"
