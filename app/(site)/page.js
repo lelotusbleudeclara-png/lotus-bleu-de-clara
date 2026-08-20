@@ -80,7 +80,7 @@ function Section({ title, products }) {
 export default async function HomePage() {
   const { data: allProducts } = await supabaseAdmin
     .from("products")
-    .select("*, categories(name), product_photos(id, storage_path, video_url, approved, position)")
+    .select("*, categories(name), product_photos(id, storage_path, video_url, approved, is_main, position)")
     .eq("published", true)
     .order("name");
 
