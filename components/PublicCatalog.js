@@ -309,8 +309,14 @@ export default function PublicCatalog({ products }) {
 
       {/* Sections */}
       {selectionProducts.length > 0 && (
-        <section className="space-y-4">
-          <h2 className="text-2xl text-lotus-800 text-center" style={{ fontFamily: "var(--font-heading)" }}>✨ La sélection du moment</h2>
+        <section className="-mx-4 px-4 py-10 space-y-6" style={{ background: "linear-gradient(135deg, #fdf6f0 0%, #fce8f3 50%, #f0f4fd 100%)" }}>
+          <div className="text-center space-y-1">
+            <p className="text-xs tracking-[0.2em] uppercase text-lotus-400 font-medium">Nos coups de cœur</p>
+            <h2 className="text-3xl text-lotus-800" style={{ fontFamily: "var(--font-heading)" }}>✨ La sélection du moment</h2>
+            <div className="flex justify-center gap-1 pt-1">
+              {[...Array(5)].map((_, i) => <span key={i} className="text-lotus-300 text-xs">◆</span>)}
+            </div>
+          </div>
           <ProductGrid products={selectionProducts} />
         </section>
       )}
