@@ -1,21 +1,20 @@
+export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import DeleteTransactionButton from "@/components/DeleteTransactionButton";
 
 export default async function TransactionDetailPage({ params }) {
   const { id } = await params;
 
   const { data: transaction, error } = await supabaseAdmin
-    .from("transactions")
-    .select("*")
-    .eq("id", id)
-    .single();
+    .from("transactions").select("*").eq("id", id).single();
 
   if (error || !transaction) notFound();
 
   const { data: signed } = await supabaseAdmin.storage
     .from("transaction-proofs")
-    .createSignedUrl(transaction.proof_photo_path, 60 * 10); // 10 minutes
+    .createSignedUrl(transaction.proof_photo_path, 60 * 10);
 
   return (
     <div className="space-y-6 max-w-lg">
@@ -49,8 +48,10 @@ export default async function TransactionDetailPage({ params }) {
         <ul className="divide-y divide-stone-100 text-sm">
           {(transaction.items || []).map((item, i) => (
             <li key={i} className="py-2 flex justify-between">
-              <span>{item.name}</span>
-              <span className="text-stone-600">{Number(item.price).toFixed(2)} €</span>
+              <span>{item.name}{item.qty > 1 ? ` ×${item.qty}` : ""}</span>
+              <span className="text-stone-600">
+                {item.line_total ? `${Number(item.line_total).toFixed(2)} €` : `${Number(item.price).toFixed(2)} €`}
+              </span>
             </li>
           ))}
         </ul>
@@ -67,6 +68,8 @@ export default async function TransactionDetailPage({ params }) {
           <img src={signed.signedUrl} alt="Preuve de remise" className="rounded-lg max-h-80 w-auto" />
         </div>
       )}
+
+      <DeleteTransactionButton id={id} />
     </div>
   );
 }

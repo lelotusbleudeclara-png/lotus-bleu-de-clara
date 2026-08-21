@@ -1,10 +1,14 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import DashboardCharts from "@/components/DashboardCharts";
 
 function startOfMonthISO() {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+}
+function startOfYearISO() {
+  return new Date(new Date().getFullYear(), 0, 1).toISOString();
 }
 
 export default async function DashboardPage() {
@@ -15,19 +19,41 @@ export default async function DashboardPage() {
   ]);
 
   const allTransactions = transactions || [];
-  const totalRevenue = allTransactions.reduce((sum, t) => sum + Number(t.total || 0), 0);
-  const salesCount = allTransactions.length;
+  const now = new Date();
+  const year = now.getFullYear();
 
+  // CA total depuis création
+  const totalRevenue = allTransactions.reduce((s, t) => s + Number(t.total || 0), 0);
+
+  // CA année civile en cours
+  const yearStart = startOfYearISO();
+  const yearRevenue = allTransactions
+    .filter(t => t.transacted_at >= yearStart)
+    .reduce((s, t) => s + Number(t.total || 0), 0);
+
+  // CA mois en cours
   const monthStart = startOfMonthISO();
-  const monthTransactions = allTransactions.filter((t) => t.transacted_at >= monthStart);
-  const monthRevenue = monthTransactions.reduce((sum, t) => sum + Number(t.total || 0), 0);
+  const monthRevenue = allTransactions
+    .filter(t => t.transacted_at >= monthStart)
+    .reduce((s, t) => s + Number(t.total || 0), 0);
 
+  const salesCount = allTransactions.length;
   const pendingPreselections = (preselections || []).filter(
-    (p) => p.status === "nouvelle" || p.status === "en_attente_parent"
+    p => p.status === "nouvelle" || p.status === "en_attente_parent"
   );
 
-  const outOfStock = (products || []).filter((p) => !p.in_stock);
-  const unpublished = (products || []).filter((p) => !p.published);
+  // CA mensuel sur l'année en cours (12 mois)
+  const monthlyData = Array.from({ length: 12 }, (_, m) => {
+    const mStart = new Date(year, m, 1).toISOString();
+    const mEnd = new Date(year, m + 1, 1).toISOString();
+    const revenue = allTransactions
+      .filter(t => t.transacted_at >= mStart && t.transacted_at < mEnd)
+      .reduce((s, t) => s + Number(t.total || 0), 0);
+    return { month: m, revenue };
+  });
+
+  const outOfStock = (products || []).filter(p => !p.in_stock);
+  const unpublished = (products || []).filter(p => !p.published);
 
   const productStats = new Map();
   for (const t of allTransactions) {
@@ -49,25 +75,25 @@ export default async function DashboardPage() {
         Tableau de bord
       </h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard label="Chiffre d'affaires total" value={`${totalRevenue.toFixed(2)} €`} />
-        <StatCard label="Ce mois-ci" value={`${monthRevenue.toFixed(2)} €`} />
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <StatCard label={`CA ${year} (année civile)`} value={`${yearRevenue.toFixed(2)} €`} />
+        <StatCard label="CA depuis la création" value={`${totalRevenue.toFixed(2)} €`} />
+        <StatCard label="CA ce mois-ci" value={`${monthRevenue.toFixed(2)} €`} />
         <StatCard label="Ventes réalisées" value={salesCount} />
-        <StatCard label="Présélections en attente" value={pendingPreselections.length} highlight={pendingPreselections.length > 0} />
+        <StatCard label="Présélections en attente" value={pendingPreselections.length}
+          highlight={pendingPreselections.length > 0} />
       </div>
+
+      {/* Graphiques */}
+      <DashboardCharts monthlyData={monthlyData} />
 
       {outOfStock.length > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <p className="text-sm font-medium text-amber-800 mb-1">
-            {outOfStock.length} produit(s) épuisé(s)
-          </p>
+          <p className="text-sm font-medium text-amber-800 mb-1">{outOfStock.length} produit(s) épuisé(s)</p>
           <ul className="text-sm text-amber-700 space-y-0.5">
-            {outOfStock.slice(0, 5).map((p) => (
-              <li key={p.id}>
-                <Link href={`/vendeur/produits/${p.id}`} className="hover:underline">
-                  {p.name}
-                </Link>
-              </li>
+            {outOfStock.slice(0, 5).map(p => (
+              <li key={p.id}><Link href={`/vendeur/produits/${p.id}`} className="hover:underline">{p.name}</Link></li>
             ))}
           </ul>
         </div>
@@ -90,9 +116,7 @@ export default async function DashboardPage() {
             {topProducts.map((p, i) => (
               <li key={i} className="py-2 flex justify-between">
                 <span>{p.name}</span>
-                <span className="text-stone-600">
-                  {p.revenue.toFixed(2)} € · {p.count} vente(s)
-                </span>
+                <span className="text-stone-600">{p.revenue.toFixed(2)} € · {p.count} vente(s)</span>
               </li>
             ))}
           </ul>
@@ -100,16 +124,10 @@ export default async function DashboardPage() {
       </div>
 
       <div className="flex gap-3">
-        <Link
-          href="/vendeur/preselections"
-          className="text-sm text-lotus-700 hover:text-lotus-900 underline"
-        >
+        <Link href="/vendeur/preselections" className="text-sm text-lotus-700 hover:text-lotus-900 underline">
           Voir les présélections →
         </Link>
-        <Link
-          href="/vendeur/transactions"
-          className="text-sm text-lotus-700 hover:text-lotus-900 underline"
-        >
+        <Link href="/vendeur/transactions" className="text-sm text-lotus-700 hover:text-lotus-900 underline">
           Voir l&apos;historique des ventes →
         </Link>
       </div>
@@ -119,11 +137,7 @@ export default async function DashboardPage() {
 
 function StatCard({ label, value, highlight }) {
   return (
-    <div
-      className={`rounded-2xl border p-4 ${
-        highlight ? "bg-amber-50 border-amber-200" : "bg-white border-stone-200"
-      }`}
-    >
+    <div className={`rounded-2xl border p-4 ${highlight ? "bg-amber-50 border-amber-200" : "bg-white border-stone-200"}`}>
       <p className="text-xs text-stone-400">{label}</p>
       <p className="text-xl font-semibold text-stone-800 mt-1">{value}</p>
     </div>
