@@ -46,6 +46,42 @@ function RichText({ text }) {
   );
 }
 
+function ZoomableImage({ src, alt }) {
+  const [lens, setLens] = useState(null);
+
+  function handleMouseMove(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+    setLens({ x, y });
+  }
+
+  return (
+    <div className="relative select-none bg-stone-50"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => setLens(null)}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} className="w-full max-h-80 object-contain" draggable={false} />
+      {lens && (
+        <div
+          className="absolute pointer-events-none rounded-xl border-2 border-lotus-300 shadow-2xl overflow-hidden"
+          style={{
+            width: 200,
+            height: 200,
+            left: `calc(${lens.x * 100}% - 100px)`,
+            top: `calc(${lens.y * 100}% - 100px)`,
+            backgroundImage: `url(${src})`,
+            backgroundSize: "350%",
+            backgroundPosition: `${lens.x * 100}% ${lens.y * 100}%`,
+            backgroundRepeat: "no-repeat",
+            zIndex: 10,
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 function ProductModal({ product, onClose, onAdd, cartQty }) {
   const approvedPhotos = (product.product_photos || []).filter(p => p.approved && !p.video_url);
   const approvedVideos = (product.product_photos || []).filter(p => p.approved && p.video_url);
@@ -91,8 +127,7 @@ function ProductModal({ product, onClose, onAdd, cartQty }) {
         {allMedia.length > 0 && (
           <div className="relative mt-4 bg-stone-50">
             {current.type === "photo" ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={current.src} alt={product.name} className="w-full max-h-80 object-contain" />
+              <ZoomableImage src={current.src} alt={product.name} />
             ) : (
               <iframe src={`https://www.youtube.com/embed/${getYoutubeId(current.src)}`}
                 className="w-full h-64" allowFullScreen />
