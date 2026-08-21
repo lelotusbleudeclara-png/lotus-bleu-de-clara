@@ -47,15 +47,30 @@ function RichText({ text }) {
 }
 
 function ProductModal({ product, onClose, onAdd, cartQty }) {
-  const thumb = getThumb(product);
-  const approvedVideos = (product.product_photos || []).filter(p => p.approved && p.video_url);
   const approvedPhotos = (product.product_photos || []).filter(p => p.approved && !p.video_url);
+  const approvedVideos = (product.product_photos || []).filter(p => p.approved && p.video_url);
+
+  // Build media list: main photo first, then others, then videos
+  const mainIdx = approvedPhotos.findIndex(p => p.is_main);
+  const orderedPhotos = mainIdx > 0
+    ? [approvedPhotos[mainIdx], ...approvedPhotos.filter((_, i) => i !== mainIdx)]
+    : approvedPhotos;
+  const allMedia = [
+    ...orderedPhotos.map(p => ({ type: "photo", src: getPublicUrl(p.storage_path), id: p.id })),
+    ...approvedVideos.map(v => ({ type: "video", src: v.video_url, id: v.id })),
+  ];
+
+  const [mediaIdx, setMediaIdx] = useState(0);
   const [qty, setQty] = useState(cartQty || 1);
+  const current = allMedia[mediaIdx];
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = ""; };
   }, []);
+
+  function prev() { setMediaIdx(i => (i - 1 + allMedia.length) % allMedia.length); }
+  function next() { setMediaIdx(i => (i + 1) % allMedia.length); }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
@@ -72,29 +87,42 @@ function ProductModal({ product, onClose, onAdd, cartQty }) {
           <button onClick={onClose} className="ml-4 mt-1 text-stone-400 hover:text-stone-700 text-xl leading-none flex-shrink-0">✕</button>
         </div>
 
-        {/* Photo */}
-        {thumb && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumb} alt={product.name} className="w-full max-h-96 object-contain bg-stone-50 mt-4" />
-        )}
-
-        {/* Extra photos */}
-        {approvedPhotos.length > 1 && (
-          <div className="flex gap-2 px-5 pt-3 overflow-x-auto">
-            {approvedPhotos.slice(1).map(p => (
+        {/* Carousel */}
+        {allMedia.length > 0 && (
+          <div className="relative mt-4 bg-stone-50">
+            {current.type === "photo" ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={p.id} src={getPublicUrl(p.storage_path)} alt="" className="w-16 h-16 object-cover rounded-lg flex-shrink-0 border border-stone-100" />
-            ))}
+              <img src={current.src} alt={product.name} className="w-full max-h-80 object-contain" />
+            ) : (
+              <iframe src={`https://www.youtube.com/embed/${getYoutubeId(current.src)}`}
+                className="w-full h-64" allowFullScreen />
+            )}
+
+            {/* Arrows */}
+            {allMedia.length > 1 && (
+              <>
+                <button onClick={prev}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 shadow text-stone-600 hover:bg-white flex items-center justify-center text-lg">
+                  ‹
+                </button>
+                <button onClick={next}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 shadow text-stone-600 hover:bg-white flex items-center justify-center text-lg">
+                  ›
+                </button>
+              </>
+            )}
+
+            {/* Dots */}
+            {allMedia.length > 1 && (
+              <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
+                {allMedia.map((_, i) => (
+                  <button key={i} onClick={() => setMediaIdx(i)}
+                    className={`w-1.5 h-1.5 rounded-full transition ${i === mediaIdx ? "bg-lotus-600 w-3" : "bg-stone-300"}`} />
+                ))}
+              </div>
+            )}
           </div>
         )}
-
-        {/* Videos */}
-        {approvedVideos.map(v => (
-          <div key={v.id} className="px-5 pt-3">
-            <iframe src={`https://www.youtube.com/embed/${getYoutubeId(v.video_url)}`}
-              className="w-full h-48 rounded-xl" allowFullScreen />
-          </div>
-        ))}
 
         {/* Details */}
         <div className="p-5 space-y-5">
